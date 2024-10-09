@@ -4,6 +4,7 @@ vim.cmd("set tabstop=2")
 vim.cmd("set softtabstop=2")
 vim.cmd("set shiftwidth=2")
 vim.g.mapleader = " "
+vim.api.nvim_set_keymap('n', '<Leader>e', ':Explore<CR>', { noremap = true, silent = true })
 
 vim.opt.swapfile = false
 vim.opt.number = true
@@ -30,20 +31,47 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Function to set colorscheme
+function Colorfix()
+    vim.cmd.colorscheme("rose-pine")
+    vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+end
+
+-- Optional: Additional configurations for other plugins can be added here
 require("lazy").setup({
-    "https://github.com/nvim-telescope/telescope.nvim",
-    "https://github.com/Mofiqul/dracula.nvim.git",
-    "https://github.com/nvim-treesitter/nvim-treesitter.git",
-    "https://github.com/ray-x/aurora",
-    "https://github.com/xero/sourcerer.vim",
-    "https://github.com/thedenisnikulin/vim-cyberpunk",
+    {
+        "rose-pine/neovim",
+        name = "rose-pine",
+        config = function()
+            Colorfix()  -- Call the function to set the colorscheme
+        end,
+    },
+    {
+        "nvim-treesitter/nvim-treesitter",
+        build = ":TSUpdate",
+        config = function()
+            local configs = require("nvim-treesitter.configs")
+            configs.setup({
+                ensure_installed = { "yaml", "bash", "json" },
+                highlight = { enable = true },
+                indent = { enable = true },
+            })
+        end,
+    },
+    {
+        "nvim-telescope/telescope.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+    },
     "williamboman/mason.nvim",
     "williamboman/mason-lspconfig.nvim",
     "neovim/nvim-lspconfig",
 })
 
-vim.cmd[[colorscheme cyberpunk]]
-vim.cmd[[highlight Comment guifg=#4B4B4B ctermfg=DarkGrey]]
+-- Enable true colors support
+vim.o.termguicolors = true
+
+vim.cmd[[highlight Comment guifg=#3D9970 ctermfg=Green]]
 
 local function setup_wsl_yank()
     local clip_path = "/mnt/c/Windows/System32/clip.exe" -- Change this path if needed
@@ -70,7 +98,7 @@ vim.opt.fileformat = "unix"
 -- Mason setup
 require("mason").setup()
 require("mason-lspconfig").setup({
-    ensure_installed = { "ansiblels", "jsonls", "bashls" },  -- Ensure required servers are included
+    ensure_installed = { "ansiblels", "jsonls", "bashls" },
 })
 
 -- LSP configuration for ansiblels
@@ -102,15 +130,6 @@ require("lspconfig").bashls.setup({
     end,
     filetypes = { "sh" },
 })
-
--- Display diagnostics on save
---vim.api.nvim_create_autocmd("BufWritePre", {
---    pattern = { "*.yml", "*.sh", "*.json" },
---    callback = function()
---        vim.diagnostic.setqflist()  -- Populate the quickfix list with diagnostics
---        vim.cmd('copen')             -- Open the quickfix window
---    end,
---})
 
 -- Optional: Auto-format on save
 vim.api.nvim_create_autocmd("BufWritePre", {
