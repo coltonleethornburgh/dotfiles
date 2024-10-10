@@ -11,11 +11,18 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 
 -- Navigate vim panes better
-vim.keymap.set('n', '<c-k>', ':wincmd k<CR>')
-vim.keymap.set('n', '<c-j>', ':wincmd j<CR>')
-vim.keymap.set('n', '<c-h>', ':wincmd h<CR>')
-vim.keymap.set('n', '<c-l>', ':wincmd l<CR>')
-vim.keymap.set('n', '<leader>h', ':nohlsearch<CR>')
+local keymap = vim.keymap.set
+local opts = { noremap = true, silent = true }
+
+-- Split commands
+keymap('n', '<leader>v', ':vsplit<CR>', opts)  -- Vertical split
+keymap('n', '<leader>s', ':split<CR>', opts)   -- Horizontal split
+
+-- Navigate between panes using leader + motion keys
+keymap('n', '<leader>k', ':wincmd k<CR>', opts)  -- Move up
+keymap('n', '<leader>j', ':wincmd j<CR>', opts)  -- Move down
+keymap('n', '<leader>h', ':wincmd h<CR>', opts)  -- Move left
+keymap('n', '<leader>l', ':wincmd l<CR>', opts)  -- Move right
 
 -- Lazy.nvim setup
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -33,9 +40,16 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Function to set colorscheme
 function Colorfix()
-    vim.cmd.colorscheme("rose-pine")
-    vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+  vim.cmd.colorscheme("rose-pine")
+  vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+  vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+  vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
+  vim.api.nvim_set_hl(0, "StatusLine", { bg = "none" })
+  vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "none" })
+  vim.api.nvim_set_hl(0, "Pmenu", { bg = "none" })
+vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#ffffff", bg = "none" })
+vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
+
 end
 
 -- Optional: Additional configurations for other plugins can be added here
@@ -63,6 +77,7 @@ require("lazy").setup({
         "nvim-telescope/telescope.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
     },
+  -- LSP stuff
     "williamboman/mason.nvim",
     "williamboman/mason-lspconfig.nvim",
     "neovim/nvim-lspconfig",
@@ -71,8 +86,10 @@ require("lazy").setup({
 -- Enable true colors support
 vim.o.termguicolors = true
 
+-- Comments green
 vim.cmd[[highlight Comment guifg=#3D9970 ctermfg=Green]]
 
+-- WSL/Windows yank function
 local function setup_wsl_yank()
     local clip_path = "/mnt/c/Windows/System32/clip.exe" -- Change this path if needed
     if vim.fn.executable(clip_path) == 1 then
@@ -92,8 +109,6 @@ local function setup_wsl_yank()
 end
 
 setup_wsl_yank()
-
-vim.opt.fileformat = "unix"
 
 -- Mason setup
 require("mason").setup()
@@ -138,4 +153,3 @@ vim.api.nvim_create_autocmd("BufWritePre", {
         vim.lsp.buf.format()
     end,
 })
-
