@@ -1,0 +1,11 @@
+# Ignore everything by default
+*
+
+# Keep .gitignore itself
+!.gitignore
+
+!nvim/
+!nvim/**
+!.tmux.conf
+!.zshconf
+!.bashrc
